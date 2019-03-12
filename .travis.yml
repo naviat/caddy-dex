@@ -1,0 +1,32 @@
+sudo: required
+language: generic
+
+services:
+  - docker
+
+env:
+  global:
+    - CADDY_VERSION: 0.111.5
+    - DOCKER_COMPOSE_VERSION: 1.23.2
+
+before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y install docker-ce
+  - sudo service docker restart
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+script:
+  - CADDY_VERSION=$CADDY_VERSION docker-compose build caddy
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u "$DOCKER_USER" -p "$DOCKER_PASS";
+    docker tag naviat/caddy:$CADDY_VERSION naviat/caddy:latest;
+    docker push naviat/caddy:$CADDY_VERSION;
+    docker push naviat/caddy:latest;
+    fi
