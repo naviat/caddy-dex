@@ -67,14 +67,14 @@ docker-compose down -v --rmi all
 
 ### Running Caddy with Docker
 
-The [stefanprodan/caddy](https://hub.docker.com/r/naviat/caddy/) comes with a default Caddyfile that 
+The [naviat/caddy](https://hub.docker.com/r/naviat/caddy/) comes with a default Caddyfile that 
 you can override by mounting your own config:
 
 ```bash
 $ docker run -d --name caddy \
     -v $(pwd)/Caddyfile:/etc/caddy/Caddyfile \
     -p 80:80 \
-    stefanprodan/caddy
+    naviat/caddy
 ```
 
 Mount your site root using the `www` volume:
