@@ -1,45 +1,49 @@
-# Build image
-FROM golang:1.12-alpine as builder
+#
+# Builder
+#
+FROM naviat/caddy:builder as builder
 
-ARG CADDY_VERSION="0.11.5"
+ARG version="1.0.0"
+ARG plugins="git,cors,realip,expires,cache"
 
-RUN apk add --no-cache git
+# process wrapper
+RUN go get -v github.com/abiosoft/parent
 
-# clone caddy
-RUN git clone https://github.com/mholt/caddy -b "v$CADDY_VERSION" /go/src/github.com/mholt/caddy \
-    && cd /go/src/github.com/mholt/caddy \
-    && git checkout -b "v$CADDY_VERSION"
+RUN VERSION=${version} PLUGINS=${plugins} ENABLE_TELEMETRY=false /bin/sh /usr/bin/builder.sh
 
-# import plugins
-COPY plugins.go /go/src/github.com/mholt/caddy/caddyhttp/plugins.go
+#
+# Final stage
+#
+FROM alpine:3.8
+LABEL maintainer "Hai Dam <haidv@tomochain.com>"
 
-# clone builder
-RUN git clone https://github.com/caddyserver/builds /go/src/github.com/caddyserver/builds
+ARG version="1.0.0"
+LABEL caddy_version="$version"
 
-# build caddy
-RUN cd /go/src/github.com/mholt/caddy/caddy \
-    && go get ./... \
-    && go run build.go \
-    && mv caddy /go/bin
+# Let's Encrypt Agreement
+ENV ACME_AGREE="false"
 
-# Dist image
-FROM alpine:3.6
+# Telemetry Stats
+ENV ENABLE_TELEMETRY="false"
 
-# install deps
-RUN apk add --no-cache --no-progress curl tini ca-certificates
+RUN apk add --no-cache openssh-client git
 
-# copy caddy binary
-COPY --from=builder /go/bin/caddy /usr/bin/caddy
+# install caddy
+COPY --from=builder /install/caddy /usr/bin/caddy
 
-# list plugins
+# validate install
+RUN /usr/bin/caddy -version
 RUN /usr/bin/caddy -plugins
 
-# static files volume
-VOLUME ["/www"]
-WORKDIR /www
+EXPOSE 80 443 2015
+VOLUME /root/.caddy /srv
+WORKDIR /srv
 
-COPY Caddyfile /etc/caddy/Caddyfile
-COPY index.md /www/index.md
+COPY Caddyfile /etc/Caddyfile
+COPY index.html /srv/index.html
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["caddy", "-agree", "--conf", "/etc/caddy/Caddyfile"]
+# install process wrapper
+COPY --from=builder /go/bin/parent /bin/parent
+
+ENTRYPOINT ["/bin/parent", "caddy"]
+CMD ["--conf", "/etc/Caddyfile", "--log", "stdout", "--agree=$ACME_AGREE"]
