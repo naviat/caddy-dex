@@ -4,7 +4,7 @@ A [Docker](https://docker.com) image for [Caddy](https://caddyserver.com). This 
 
 Plugins can be configured via the [`plugins` build arg](#custom-plugins).
 
-[![](https://images.microbadger.com/badges/image/abiosoft/caddy.svg)](https://microbadger.com/images/abiosoft/caddy "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/naviat/caddy.svg)](https://microbadger.com/images/naviat/caddy "Get your own image badge on microbadger.com")
 [![](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/mholt/caddy/tree/v1.0.0)
 
 Check [naviat/caddy:builder](https://github.com/naviat/caddy-dex/blob/master/BUILDER.md) for generating cross-platform Caddy binaries.
