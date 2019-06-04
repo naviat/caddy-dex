@@ -59,29 +59,6 @@ $ docker run -d \
 Above, we utilize the `CADDYPATH` environment variable to define a different location inside the container for
 certificates to be stored. This is probably the safest option as it ensures any future docker image changes don't interfere with your ability to save certificates!
 
-### PHP
-
-`:[<version>-]php` variant of this image bundles PHP-FPM alongside essential php extensions and [composer](https://getcomposer.org). e.g. `:php`, `:0.10.14-php`
-
-```sh
-$ docker run -d -p 2015:2015 naviat/caddy:php
-```
-
-Point your browser to `http://127.0.0.1:2015` and you will see a php info page.
-
-##### Local php source
-
-Replace `/path/to/php/src` with your php sources directory.
-
-```sh
-$ docker run -d -v /path/to/php/src:/srv -p 2015:2015 naviat/caddy:php
-```
-
-Point your browser to `http://127.0.0.1:2015`.
-
-##### Note
-
-Your `Caddyfile` must include the line `on startup php-fpm7`. For Caddy to be PID 1 in the container, php-fpm7 could not be started.
 
 ### Using git sources
 
