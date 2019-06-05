@@ -6,7 +6,7 @@ FROM naviat/caddy:builder as builder
 ARG version="1.0.0"
 ARG plugins="git,cors,realip,expires,cache,prometheus,ipfilter"
 
-# process wrapper
+# process wrapper from @abiosoft. Thank you
 RUN go get -v github.com/abiosoft/parent
 
 RUN VERSION=${version} PLUGINS=${plugins} ENABLE_TELEMETRY=false /bin/sh /usr/bin/builder.sh
@@ -46,4 +46,4 @@ COPY index.html /srv/index.html
 COPY --from=builder /go/bin/parent /bin/parent
 
 ENTRYPOINT ["/bin/parent", "caddy"]
-CMD ["--conf", "/etc/Caddyfile", "--log", "stdout", "--agree=$ACME_AGREE", "-disable-tls-alpn-challenge"]
+CMD ["--conf", "/etc/Caddyfile", "--log", "stdout", "--agree=$ACME_AGREE", "--disable-tls-alpn-challenge"]
