@@ -15,7 +15,7 @@ RUN VERSION=${version} PLUGINS=${plugins} ENABLE_TELEMETRY=false /bin/sh /usr/bi
 # Final stage
 #
 FROM alpine:3.8
-LABEL maintainer "Hai Dam <haidv@tomochain.com>"
+LABEL maintainer = "Hai Dam <haidv@tomochain.com>"
 
 ARG version="1.0.0"
 LABEL caddy_version="$version"
